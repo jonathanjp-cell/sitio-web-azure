@@ -1,0 +1,38 @@
+
+name: Desplegar sitio web en Azure
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Publicar archivos en Azure
+        env:
+          AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+        run: |
+          az storage blob upload-batch \
+            --destination '$web' \
+            --source . \
+            --pattern '*.html' \
+            --overwrite true
+
+          az storage blob upload-batch \
+            --destination '$web' \
+            --source . \
+            --pattern '*.css' \
+            --overwrite true
+
+          az storage blob upload-batch \
+            --destination '$web' \
+            --source . \
+            --pattern '*.js' \
+            --overwrite true
